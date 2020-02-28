@@ -1,7 +1,9 @@
 import { createStackNavigator } from 'react-navigation-stack';
 import Home from '../screens/Home'
 import Header from "../shared/header";
-import Start_Destination from "../screens/Start_Destination";
+import HeaderNone from "../shared/headerNone";
+import Order_Summary from '../screens/Order_Summary';
+import About from "../screens/About";
 import React from 'react';
 const screens = {
     Home:{
@@ -12,11 +14,12 @@ const screens = {
             }
         }
     },
-
-    Start_Destination:{
-        screen: Start_Destination,
+    Order_Summary:{
+        screen: Order_Summary,
         navigationOptions: ({ navigation }) => {
-
+            return {
+                headerTitle: () => <HeaderNone navigation={navigation} title='Order Summary'/>,
+            }
         }
     },
 

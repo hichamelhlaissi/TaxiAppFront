@@ -1,31 +1,22 @@
 import React, { Component } from 'react';
-import { Platform, Text, View, StyleSheet, Image , Alert, Dimensions, TouchableOpacity } from 'react-native';
+import {Platform, Text, View, StyleSheet, Image, Alert, Dimensions, TouchableOpacity, Button} from 'react-native';
 import Constants from 'expo-constants';
 import * as Location from 'expo-location';
 import * as Permissions from 'expo-permissions';
 import MapView, { PROVIDER_GOOGLE, Marker, Callout, Polygon, Circle } from 'react-native-maps';
 import Carousel from 'react-native-snap-carousel';
-// import { createStackNavigator } from 'react-navigation-stack';
-// import Start_Destination from "../screens/Start_Destination";
-// import { MaterialIcons} from '@expo/vector-icons';
-
 import { Linking } from 'expo';
 import {AppState} from 'react-native';
 import * as IntentLauncher from 'expo-intent-launcher';
 
-// const AppNavigator = createStackNavigator(
-//     {
-
-//         Start_Destination: Start_Destination
-//     },
-// );
 export default class Home extends Component  {
 
     state = {
         location: null,
         errorMessage: null,
-        markers: [],
         appState: AppState.currentState,
+        LatLng: null,
+        markers: [],
         coordinates: [
             { name: 'Hamid', latitude: 34.066645, longitude: -6.762011, image: require('../../assets/Images/image.jpg') },
             { name: 'Rachel', latitude: 34.076353, longitude: -6.754076, image: require('../../assets/Images/image.jpg') },
@@ -36,20 +27,8 @@ export default class Home extends Component  {
         ]
     };
 
-
-
-   /*  componentWillMount() {
-         if (Platform.OS === 'android' && !Constants.isDevice) {
-            this.setState({
-                errorMessage: 'Oops, this will not work on Sketch in an Android emulator. Try it on your device!',
-            });
-        } else {
-          this._getLocationAsync().then(r =>this._getLocationAsync() );
-        }
-     }*/
     constructor(props) {
         super(props);
-        // N’appelez pas `this.setState()` ici !
         if (Platform.OS === 'android' && !Constants.isDevice || Platform.OS === 'ios' && !Constants.isDevice) {
             this.setState({
                 errorMessage: 'Oops, this will not work on Sketch in an Android emulator. Try it on your device!',
@@ -106,9 +85,6 @@ export default class Home extends Component  {
     _getLocationAsync = async () => {
         let { status } = await Permissions.askAsync(Permissions.LOCATION);
         if (status !== 'granted') {
-            // this.setState({
-            //     errorMessage: 'Permission to access location was denied',
-            // });
             this.requestlocation();
         }
 
@@ -126,11 +102,11 @@ export default class Home extends Component  {
 
     };
     onCarouselItemChange = (index) => {
-        let location = this.state.coordinates[index];
+        let locationMarker = this.state.coordinates[index];
 
         this._map.animateToRegion({
-            latitude: location.latitude,
-            longitude: location.longitude,
+            latitude: locationMarker.latitude,
+            longitude: locationMarker.longitude,
             latitudeDelta: 0.09,
             longitudeDelta: 0.035
         });
@@ -138,10 +114,10 @@ export default class Home extends Component  {
         this.state.markers[index].showCallout()
     };
 
-    onMarkerPressed = (location, index) => {
+    onMarkerPressed = (locationMarker, index) => {
         this._map.animateToRegion({
-            latitude: location.latitude,
-            longitude: location.longitude,
+            latitude: locationMarker.latitude,
+            longitude: locationMarker.longitude,
             latitudeDelta: 0.09,
             longitudeDelta: 0.035
         });
@@ -150,41 +126,39 @@ export default class Home extends Component  {
     };
     renderCarouselItem;
 
-    render() {
-
-        let lat1 = JSON.stringify(this.state.initialPosition);
-        let LatLng = {
-            latitude: 1,
-            longitude: 1,
+    UpdateStart =(ee) => {
+        this.setState({ ee });
+        let AfterChanged = ee;
+        let CoordsValues ={
+            latitude: AfterChanged.latitude,
+            longitude: AfterChanged.longitude,
         };
-        let LatLng1 = {
+        this.setState({ CoordsValues });
+    };
+
+    SetDestination =(ee) => {
+        this.setState({ ee });
+        let AfterChanged = ee;
+        let CoordsValues ={
+            latitude: AfterChanged.latitude,
+            longitude: AfterChanged.longitude,
+        };
+        this.setState({ CoordsValues });
+    };
+
+    render() {
+        let lat1 = JSON.stringify(this.state.initialPosition);
+         this.LatLng = {
             latitude: 1,
             longitude: 1,
         };
         if(lat1 !== undefined){
-             LatLng = {
+            this.LatLng = {
                 latitude: this.state.initialPosition.latitude,
                 longitude: this.state.initialPosition.longitude
             };
-
-
-            console.log(this.state.initialPosition.latitude)
         }
 
-        this.renderCarouselItem = ({ item,  LatLng1}) =>
-            <View style={styles.cardContainer}>
-                <Text style={styles.cardTitle}>{item.name}</Text>
-                <Image style={styles.cardImage} source={item.image} />
-                <TouchableOpacity onPress={() =>
-                    this.props.navigation.navigate('Start_Destination', {
-                        UserLatitude : this.state.initialPosition.latitude,
-                        UserLongitude : this.state.initialPosition.longitude,
-                        TaxiLatitude : item.latitude,
-                        TaxiLongitude : item.longitude,
-                    })}>
-                    <Text>{item.name}</Text>
-                </TouchableOpacity>
-            </View>;
 
 
         let text = 'Waiting...';
@@ -194,19 +168,51 @@ export default class Home extends Component  {
             text = JSON.stringify(this.state.location);
         }
 
+        this.renderCarouselItem = ({item}) =>
+            <View style={styles.cardContainer}>
+                <Text style={styles.cardTitle}>{item.name}</Text>
+                <Image style={styles.cardImage} source={item.image} />
+                <Button title={'Go Order'} onPress={() =>
+                    this.props.navigation.navigate('Order_Summary')}>
+                </Button>
+            </View>;
+
         return (
             <View style={styles.container}>
                 <MapView style={styles.map}
-                         provider={PROVIDER_GOOGLE}
                          ref={map => this._map = map}
+                         provider={PROVIDER_GOOGLE}
                          showsUserLocation={true}
                          initialRegion={this.state.initialPosition}
                 >
                     <MapView.Circle
-                        center={LatLng}
+                        center={this.LatLng}
                         radius={2000}
                         fillColor={'rgba(255,157,245,0.5)'}
                     />
+
+                    <Marker
+                        pinColor={'rgba(124,7,255,0.5)'}
+                        coordinate={this.LatLng}
+                        draggable
+                        onDragEnd={(e) => {this.UpdateStart( e.nativeEvent.coordinate)}}
+
+                    >
+                        <Callout>
+                            <Text>User</Text>
+                        </Callout>
+                    </Marker>
+                    <Marker
+                        pinColor={'rgba(255,10,16,0.5)'}
+                        coordinate={{latitude:34.052910, longitude:-6.781228}}
+                        draggable
+                        onDragEnd={(e) => {this.SetDestination( e.nativeEvent.coordinate)}}
+
+                    >
+                        <Callout>
+                            <Text>Destination</Text>
+                        </Callout>
+                    </Marker>
 
                     {
                         this.state.coordinates.map((marker, index) => (
@@ -215,7 +221,8 @@ export default class Home extends Component  {
                                 ref={ref => this.state.markers[index] = ref}
                                 onPress={() => this.onMarkerPressed(marker, index)}
                                 coordinate={{ latitude: marker.latitude, longitude: marker.longitude }}
-                               // icon={require('../../assets/Images/taxi.png')}
+                                pinColor={'rgba(223,255,22,0.6)'}
+                                // icon={require('../../assets/Images/taxi.png')}
                             >
                                 <Callout>
                                     <Text>{marker.name}</Text>
@@ -234,6 +241,7 @@ export default class Home extends Component  {
                     removeClippedSubviews={false}
                     onSnapToItem={(index) => this.onCarouselItemChange(index)}
                 />
+
             </View>
         );
     }
@@ -244,7 +252,10 @@ const styles = StyleSheet.create({
         ...StyleSheet.absoluteFillObject
     },
     map: {
-        ...StyleSheet.absoluteFillObject
+        flex: 1,
+        width: '100%',
+        height: '100%',
+        position: 'absolute',
     },
     paragraph: {
         margin: 24,
@@ -279,5 +290,10 @@ const styles = StyleSheet.create({
         color: 'white',
         fontSize: 22,
         alignSelf: 'center'
+    },
+    ConButton: {
+        marginTop: 650,
+        width: '100%',
+        fontSize: 30
     }
 });

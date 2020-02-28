@@ -14,6 +14,9 @@ const screens = {
         }
     },
 
+
+
+
 };
 const AboutStack = createStackNavigator(screens);
 export default AboutStack;
