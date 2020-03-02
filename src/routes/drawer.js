@@ -3,6 +3,7 @@ import {createAppContainer} from "react-navigation";
 import AboutStack from "./AboutStack";
 import HomeStack from "./HomeStack";
 import ProfileStack from "./ProfileStack";
+import OrdersStack from "./OrdersStack";
 import { StyleSheet, Text, View, FlatList, TouchableOpacity, Image} from 'react-native';
 import {Container, Header, Body, Content} from 'native-base';
 import React from "react";
@@ -14,6 +15,9 @@ const RootDrawerNavigator = createDrawerNavigator({
     },
     Profile: {
         screen: ProfileStack,
+    },
+    Orders: {
+        screen: OrdersStack,
     },
     About: {
         screen: AboutStack,
