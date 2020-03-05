@@ -1,88 +1,71 @@
 import React, { Component } from 'react';
-import {View, Text, StyleSheet, TouchableOpacity, Alert, TextInput, Button, Modal, TouchableHighlight} from 'react-native';
+import {
+    View,
+    Text,
+    StyleSheet,
+    TouchableOpacity,
+    Alert,
+    TextInput,
+    Button,
+    Modal,
+    TouchableHighlight,
+    Image
+} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import ModalWrapper from "react-native-modal-wrapper";
 import {APPROX_STATUSBAR_HEIGHT} from "react-native-paper/src/constants";
+import ajax from "../../services/fetchOrders";
 
 export default class HistoryRoute extends Component {
 
     state = {
         orders: [],
-        message: "",
+        isLoading: true,
     };
+
+    async componentDidMount() {
+        const orders = await ajax.fetchOrdersRequest();
+        this.setState({
+            orders: orders,
+            isLoading: false,
+        });
+    }
 
     render() {
         return (
             <View style={styles.container}>
-                <View style={styles.cardStyle}>
-                    <View style={styles.infos}>
-                        <Text style={styles.name}>Youssef Lahyan</Text>
-                        <Text style={styles.date}><Icon name="calendar" size={18} color="#fff" />  jan 12, 2019</Text>
-                        <View style={styles.fromTo}>
-                            <Text style={[styles.fromToText, {marginRight: 10}]}>From</Text>
-                            <Text style={styles.fromToText}><Icon name="map-marker" size={20} color="#fff" /> Here</Text>
-                        </View>
-                        <View style={styles.fromTo}>
-                            <Text style={[styles.fromToText, {marginRight: 10}]}>To</Text>
-                            <Text style={styles.fromToText}><Icon name="map-marker" size={20} color="#fff" /> There</Text>
-                        </View>
-                        <Text style={styles.status}><Icon name="circle" size={12} color="#41B619" /> Accepted</Text>
-                    </View>
-                    <View style={styles.buttonsView}>
-                        <TouchableOpacity style={styles.buttons} onPress={() => Alert.alert('Action!','Added to favorite')}>
-                            <Text style={styles.buttonsText}><Icon name="star" size={15} color="#EAE114" /> Add to favorite</Text>
-                        </TouchableOpacity >
-                        <TouchableOpacity style={[ styles.buttons, { marginTop: 12 } ]} onPress={() => Alert.alert('Action!','Cancel')}>
-                            <Text style={styles.buttonsText}>Cancel</Text>
-                        </TouchableOpacity >
-                    </View>
-                </View>
-                <View style={styles.cardStyle}>
-                    <View style={styles.infos}>
-                        <Text style={styles.name}>Hicham Elhlaissi</Text>
-                        <Text style={styles.date}><Icon name="calendar" size={18} color="#fff" />  jan 12, 2019</Text>
-                        <View style={styles.fromTo}>
-                            <Text style={[styles.fromToText, {marginRight: 10}]}>From</Text>
-                            <Text style={styles.fromToText}><Icon name="map-marker" size={20} color="#fff" /> Here</Text>
-                        </View>
-                        <View style={styles.fromTo}>
-                            <Text style={[styles.fromToText, {marginRight: 10}]}>To</Text>
-                            <Text style={styles.fromToText}><Icon name="map-marker" size={20} color="#fff" /> There</Text>
-                        </View>
-                        <Text style={styles.status}><Icon name="circle" size={12} color="#FF0000" /> Not accepted</Text>
-                    </View>
-                    <View style={styles.buttonsView}>
-                        <TouchableOpacity style={styles.buttons} onPress={() => Alert.alert('Action!','Added to favorite')}>
-                            <Text style={styles.buttonsText}><Icon name="star" size={15} color="#EAE114" /> Add to favorite</Text>
-                        </TouchableOpacity >
-                        <TouchableOpacity style={[ styles.buttons, { marginTop: 12 } ]} onPress={() => Alert.alert('Action!','Cancel')}>
-                            <Text style={styles.buttonsText}>Cancel</Text>
-                        </TouchableOpacity >
-                    </View>
-                </View>
-                <View style={styles.cardStyle}>
-                    <View style={styles.infos}>
-                        <Text style={styles.name}>Leo Messi</Text>
-                        <Text style={styles.date}><Icon name="calendar" size={18} color="#fff" />  jan 12, 2019</Text>
-                        <View style={styles.fromTo}>
-                            <Text style={[styles.fromToText, {marginRight: 10}]}>From</Text>
-                            <Text style={styles.fromToText}><Icon name="map-marker" size={20} color="#fff" /> Here</Text>
-                        </View>
-                        <View style={styles.fromTo}>
-                            <Text style={[styles.fromToText, {marginRight: 10}]}>To</Text>
-                            <Text style={styles.fromToText}><Icon name="map-marker" size={20} color="#fff" /> There</Text>
-                        </View>
-                        <Text style={styles.status}><Icon name="circle" size={12} color="#FFAD32" /> On pending</Text>
-                    </View>
-                    <View style={styles.buttonsView}>
-                        <TouchableOpacity style={styles.buttons} onPress={() => Alert.alert('Action!','Added to favorite')}>
-                            <Text style={styles.buttonsText}><Icon name="star" size={15} color="#EAE114" /> Add to favorite</Text>
-                        </TouchableOpacity >
-                        <TouchableOpacity style={[ styles.buttons, { marginTop: 12 } ]} onPress={() => Alert.alert('Action!','Cancel')}>
-                            <Text style={styles.buttonsText}>Cancel</Text>
-                        </TouchableOpacity >
-                    </View>
-                </View>
+                {
+                    this.state.isLoading ? <View style={styles.isLoading}><Image source={require('../../../assets/Images/spinner.gif')}/></View>
+                        :
+                        this.state.orders.length > 0
+                            ? this.state.orders.map((order) => {
+                                return (
+                                    <View style={styles.cardStyle} key={order.id}>
+                                        <View style={styles.infos}>
+                                            <Text style={styles.name}>{order.taxi_owner}</Text>
+                                            <Text style={styles.date}><Icon name="calendar" size={18} color="#fff" />  {order.date_time}</Text>
+                                            <View style={styles.fromTo}>
+                                                <Text style={[styles.fromToText, {marginRight: 10}]}>From</Text>
+                                                <Text style={styles.fromToText}><Icon name="map-marker" size={20} color="#fff" /> Here</Text>
+                                            </View>
+                                            <View style={styles.fromTo}>
+                                                <Text style={[styles.fromToText, {marginRight: 10}]}>To</Text>
+                                                <Text style={styles.fromToText}><Icon name="map-marker" size={20} color="#fff" /> There</Text>
+                                            </View>
+                                        </View>
+                                        <View style={styles.buttonsView}>
+                                            <TouchableOpacity style={styles.buttons} onPress={() => Alert.alert('Action!','Added to favorite')}>
+                                                <Text style={styles.buttonsText}><Icon name="star" size={15} color="#EAE114" /> Add to favorite</Text>
+                                            </TouchableOpacity >
+                                            <TouchableOpacity style={[ styles.buttons, { marginTop: 12 } ]} onPress={() => Alert.alert('Action!','Cancel')}>
+                                                <Text style={styles.buttonsText}>Cancel</Text>
+                                            </TouchableOpacity >
+                                        </View>
+                                    </View>
+                                )
+                            })
+                            : <View style={styles.noOrders}><Text>No orders</Text></View>
+                }
             </View>
         );
     }
@@ -93,6 +76,16 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'column',
         alignItems: 'center',
+    },
+    noOrders : {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    isLoading : {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     infos: {
         flexDirection: 'column',
