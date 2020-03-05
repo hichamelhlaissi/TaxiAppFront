@@ -14,7 +14,7 @@ import Trajet from './Trajet';
 import Carouseltaxis from './Carouseltaxis';
 
 import * as service from '../service';
-
+import * as Taxis from "./ChooseTaxi";
 // const AppNavigator = createStackNavigator(
 //     {
 
@@ -35,11 +35,11 @@ export default class Home extends Component  {
         markers: [],
         appState: AppState.currentState,
         coordinates: [
-            { name: 'Hamid', latitude: 34.066645, longitude: -6.762011, image: require('../../assets/Images/image.jpg') },
-            { name: 'Rachel', latitude: 34.076353, longitude: -6.754076, image: require('../../assets/Images/image.jpg') },
-            { name: 'HASHIM', latitude: 34.077499, longitude: -6.759966, image: require('../../assets/Images/image.jpg') },
-            { name: 'Fared', latitude: 34.062096, longitude: -6.772277, image: require('../../assets/Images/image.jpg') },
-            { name: 'Saber', latitude: 34.056736, longitude: -6.771318, image: require('../../assets/Images/image.jpg') },
+            // { name: 'Hamid', latitude: 34.066645, longitude: -6.762011, image: require('../../assets/Images/image.jpg') },
+            // { name: 'Rachel', latitude: 34.076353, longitude: -6.754076, image: require('../../assets/Images/image.jpg') },
+            // { name: 'HASHIM', latitude: 34.077499, longitude: -6.759966, image: require('../../assets/Images/image.jpg') },
+            // { name: 'Fared', latitude: 34.062096, longitude: -6.772277, image: require('../../assets/Images/image.jpg') },
+            // { name: 'Saber', latitude: 34.056736, longitude: -6.771318, image: require('../../assets/Images/image.jpg') },
         ]
     };
 
@@ -89,6 +89,11 @@ export default class Home extends Component  {
           }
           if( this.state.departinfo == this.state.destinationinfo){
             this.problem();
+          }
+          if(Taxis.Taxi.length > 0 && this.state.coordinates.length == 0){ 
+              
+           this.setState({coordinates:Taxis.Taxi})
+        // console.log(Taxis.Taxi) 
           }
       }
       problem=()=>{
@@ -303,6 +308,7 @@ export default class Home extends Component  {
          return(
              <>
                 <Carouseltaxis
+                        onCarouselItemChange={this.onCarouselItemChange}
                         confirmOrder={this.confirmOrder} 
                         containerCustomStyle={styles.carousel}
                         departinfo={this.state.departinfo}
@@ -357,21 +363,21 @@ export default class Home extends Component  {
                         fillColor={'rgba(255,157,245,0.5)'}
                     />
 
-                    {/* {
+                    {
                         this.state.coordinates.map((marker, index) => (
                             <Marker
-                                key={marker.name}
+                                key={marker.id}
                                 ref={ref => this.state.markers[index] = ref}
                                 onPress={() => this.onMarkerPressed(marker, index)}
                                 coordinate={{ latitude: marker.latitude, longitude: marker.longitude }}
                                // icon={require('../../assets/Images/taxi.png')}
                             >
                                 <Callout>
-                                    <Text>{marker.name}</Text>
+                                    <Text>{marker.ownername}</Text>
                                 </Callout>
                             </Marker>
-                        ))
-                    } */}
+                        )) 
+                    }
                     
                     {this.departmarker()}
                     {this.destinationmarker()}

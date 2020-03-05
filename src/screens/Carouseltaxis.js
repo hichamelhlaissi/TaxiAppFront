@@ -88,7 +88,8 @@ export default class Carouseltaxis extends Component{
     };
     affcondition=()=>{
         if(this.state.listTaxi.length > 0){ 
-            return( <Carousel
+            return( 
+          <Carousel
             ref={(c) => { this._carousel = c; }}
             data={this.state.listTaxi} 
             containerCustomStyle={styles.carousel}
@@ -96,18 +97,18 @@ export default class Carouseltaxis extends Component{
             sliderWidth={Dimensions.get('window').width}
             itemWidth={300}
             removeClippedSubviews={false}
-            // onSnapToItem={(index) => this.onCarouselItemChange(index)}
+            onSnapToItem={(index) => this.props.onCarouselItemChange(index)}
         />)
             }else{
-                console.log("okk")
-            return   (<Carousel
+            return   (
+          <Carousel
                 data={this.state.listwait} 
                 containerCustomStyle={styles.carousel}
                 renderItem={()=><Spinner color='black' />}
                 sliderWidth={Dimensions.get('window').width}
                 itemWidth={300}
                 removeClippedSubviews={false}
-                // onSnapToItem={(index) => this.onCarouselItemChange(index)}
+               
             />)
             }
     }

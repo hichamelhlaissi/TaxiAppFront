@@ -4,10 +4,9 @@ import { StyleSheet , FlatList , Alert} from 'react-native';
 import { Button , Spinner , Icon} from 'native-base';
 import Taxiinfo from './Taxiinfo';
 import * as service from '../service';
- export const Taxi=[
 
-       
-]
+export const Taxi=[]
+
 export function getTaxis(){
     new Promise(function(res , rej) {
         if(Taxi.length == 0){
