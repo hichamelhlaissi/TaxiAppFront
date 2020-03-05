@@ -1,47 +1,141 @@
 import React, { Component } from 'react';
-import {Platform, Text, View, StyleSheet, Image, Alert, Dimensions, TouchableOpacity, Button} from 'react-native';
+import { Platform, Text, View, StyleSheet, Image , Alert, Dimensions, TouchableOpacity } from 'react-native';
 import Constants from 'expo-constants';
 import * as Location from 'expo-location';
 import * as Permissions from 'expo-permissions';
 import MapView, { PROVIDER_GOOGLE, Marker, Callout, Polygon, Circle } from 'react-native-maps';
-import Carousel from 'react-native-snap-carousel';
+
+
 import { Linking } from 'expo';
 import {AppState} from 'react-native';
 import * as IntentLauncher from 'expo-intent-launcher';
+import { Button , Spinner} from 'native-base';
+import Trajet from './Trajet';
+import Carouseltaxis from './Carouseltaxis';
 
-export default class Home extends Component  {
+import * as service from '../service';
+
+// const AppNavigator = createStackNavigator(
+//     {
+
+//         Start_Destination: Start_Destination
+//     },
+// );
+export default class Home extends Component  { 
 
     state = {
+        locationpermission :false,
+        departinfo:{},
+        destinationinfo:{},
         location: null,
         errorMessage: null,
-        appState: AppState.currentState,
-        LatLng: null,
         markers: [],
+        appState: AppState.currentState,
         coordinates: [
             { name: 'Hamid', latitude: 34.066645, longitude: -6.762011, image: require('../../assets/Images/image.jpg') },
             { name: 'Rachel', latitude: 34.076353, longitude: -6.754076, image: require('../../assets/Images/image.jpg') },
             { name: 'HASHIM', latitude: 34.077499, longitude: -6.759966, image: require('../../assets/Images/image.jpg') },
             { name: 'Fared', latitude: 34.062096, longitude: -6.772277, image: require('../../assets/Images/image.jpg') },
             { name: 'Saber', latitude: 34.056736, longitude: -6.771318, image: require('../../assets/Images/image.jpg') },
-
         ]
     };
 
+
+
+    // componentWillMount() {
+    //     if (Platform.OS === 'android' && !Constants.isDevice) {
+    //         this.setState({
+    //             errorMessage: 'Oops, this will not work on Sketch in an Android emulator. Try it on your device!',
+    //         });
+    //     } else {
+    //         this._getLocationAsync().then(r =>this._getLocationAsync() );
+    //     }
+    // }
     constructor(props) {
         super(props);
+        // N’appelez pas `this.setState()` ici !
         if (Platform.OS === 'android' && !Constants.isDevice || Platform.OS === 'ios' && !Constants.isDevice) {
             this.setState({
                 errorMessage: 'Oops, this will not work on Sketch in an Android emulator. Try it on your device!',
             });
         } else {
-            this._getLocationAsync();
+            this._getLocationAsync();     
         }
         Location.hasServicesEnabledAsync().then(
             data=>{
                 console.log(data)
-            }
+            }      
         )
       }
+      componentDidUpdate(prevrops , prevState){
+          if(prevState.departinfo !==  this.state.departinfo){
+            this._map.animateToRegion({
+                latitude: this.state.departinfo.lat,
+                longitude: this.state.departinfo.lng,
+                latitudeDelta: 0.09,
+                longitudeDelta: 0.035
+            });
+          }
+          if(Object.keys(this.state.destinationinfo).length   != 0 && prevState.destinationinfo && prevState.destinationinfo !==  this.state.destinationinfo){
+            this._map.animateToRegion({ 
+                latitude: this.state.destinationinfo.lat,
+                longitude: this.state.destinationinfo.lng,
+                latitudeDelta: 0.09,
+                longitudeDelta: 0.035
+            });
+          }
+          if( this.state.departinfo == this.state.destinationinfo){
+            this.problem();
+          }
+      }
+      problem=()=>{
+        Alert.alert("l'adresse de destination ne peut pas être la même que l'adresse de départ ", " tu dois la changer", [
+            { 
+              text: 'OK',
+              onPress: () => this.setState({destinationinfo:{}}),
+              style: 'OK',
+            }
+          ]);
+      }
+      notifydepart=(depart)=>{
+        if(depart){
+            this.setState({departinfo:depart})
+        }
+      }
+      notifydestination=(destination)=>{
+        if(destination){
+            this.setState({destinationinfo:destination})
+        }
+      }
+      departmarker=()=>{
+        if(Object.keys(this.state.departinfo).length   != 0){
+            return (
+                <Marker
+                        pinColor={'rgba(38, 114, 227, 1)'}
+                        coordinate={{latitude: this.state.departinfo.lat, longitude: this.state.departinfo.lng}}
+                    >
+                        <Callout>
+                            <Text>FROM</Text>
+                        </Callout>
+                </Marker>
+            )
+        }
+       }
+       destinationmarker=()=>{
+        if(Object.keys(this.state.destinationinfo).length   != 0){
+            return (
+                <Marker
+                        pinColor={'rgba(227, 211, 38, 1)'}
+                        coordinate={{latitude: this.state.destinationinfo.lat, longitude: this.state.destinationinfo.lng}}
+                    >
+                        <Callout>
+                            <Text>Destination</Text>
+                        </Callout>
+                </Marker>
+            )
+        }
+       }
+  
       componentDidMount() {
         AppState.addEventListener('change', this._handleAppStateChange);
       }
@@ -53,71 +147,114 @@ export default class Home extends Component  {
             this._getLocationAsync();
         }
         this.setState({appState: nextAppState});
-      };
+      }
+     
+    // _getLocationAsync =  () => { 
+    //     // let { status } = await Permissions.askAsync(Permissions.LOCATION);
+    //     Location.getPermissionsAsync(Permissions.LOCATION).then(data=>{
+    //         console.log(data.status)
+    //         if(data.status == 'granted'){ 
+    //             Location.getCurrentPositionAsync({}).then(
+    //                 data=>{
+    //              this.setState({location: data });
+    //              let initialPosition = {
+    //                  latitude: data.coords.latitude,
+    //                  longitude: data.coords.longitude,  
+    //                  latitudeDelta: 0.09,
+    //                  longitudeDelta: 0.035
+    //              };
 
-    goToSettings = () => {
-        if (Platform.OS == 'ios') {
-          // Linking for iOS
-          Linking.openURL('app-settings:')
-
-        } else {
-        //   IntentLauncher for Android
-          IntentLauncher.startActivityAsync(
-            IntentLauncher.ACTION_MANAGE_ALL_APPLICATIONS_SETTINGS
-          );
+    //              this.setState({ initialPosition,
+    //                              locationpermission:true,
+    //                              departinfo:{
+    //                                 lat: data.coords.latitude,
+    //                                 lng: data.coords.longitude,  
+    //                              }});
+    //                 }
+    //             )
+    //         }else{
+    //         this.setState({
+    //             errorMessage: 'Permission to access location was denied',
+    //         });
+    //             this.requestlocation();   
+    //         }
+    //     }) 
+    // };
+    _getLocationAsync = async () => {
+        let { status } = await Permissions.askAsync(Permissions.LOCATION);
+        if (status !== 'granted') {
+            this.requestlocation();
         }
-      };
-     requestlocation =()=>{
+
+        let location = await Location.getCurrentPositionAsync({});
+        this.setState({ location });
+
+        let initialPosition = { 
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+            latitudeDelta: 0.09,
+            longitudeDelta: 0.035,
+        };
+        this.setState({ 
+            initialPosition,
+            locationpermission:true, 
+            departinfo:{
+                lat: location.coords.latitude,
+                lng: location.coords.longitude,  
+             } });
+
+
+    };
+    requestlocation =()=>{ 
         Alert.alert("alert Message", "Allow Location", [
-            {
+            { 
               text: 'Open Settings',
               onPress: () => this.goToSettings(),
               style: 'cancel',
-            },
+            }, 
             {
                 text: 'Cancel',
                 onPress: () => console.log('Cancel Pressed'),
                 style: 'cancel',
               },
           ]);
-
+    
+    }
+    goToSettings = () => {
+        if (Platform.OS == 'ios') {
+          // Linking for iOS
+          Linking.openURL('app-settings:')
+ 
+        } else {
+        //   IntentLauncher for Android
+          IntentLauncher.startActivityAsync(
+            IntentLauncher.ACTION_MANAGE_ALL_APPLICATIONS_SETTINGS
+          );
+        }   
     };
-    _getLocationAsync =  () => {
-        // let { status } = await Permissions.askAsync(Permissions.LOCATION);
-        Location.getPermissionsAsync().then(data=>{
-            if(data.status == 'granted'){
-                Location.getCurrentPositionAsync({}).then(
-                    data=>{
-                        this.setState({location: data });
-                        let initialPosition = {
-                            latitude: data.coords.latitude,
-                            longitude: data.coords.longitude,
-                            latitudeDelta: 0.09,
-                            longitudeDelta: 0.035
-                        };
-
-                        this.setState({ initialPosition,
-                            locationpermission:true,
-                            departinfo:{
-                                lat: data.coords.latitude,
-                                lng: data.coords.longitude,
-                            }});
-                    }
-                )
-            }else{
-                this.setState({
-                    errorMessage: 'Permission to access location was denied',
-                });
-                this.requestlocation();
-            }
-        })
-    };
+    searchinterface=()=>{
+     if(this.state.locationpermission){
+        return(<View style={styles.search}>
+            <Trajet 
+            departinfo={this.state.departinfo}
+            handledepart={this.notifydepart} 
+            handledestination={this.notifydestination}>
+            </Trajet>
+            </View>) 
+     }else{
+         return(
+            <View style={styles.search}>
+            <Spinner color='black' /> 
+            </View>
+         )
+     }
+    }
     onCarouselItemChange = (index) => {
-        let locationMarker = this.state.coordinates[index];
+        let location = this.state.coordinates[index];
 
         this._map.animateToRegion({
-            latitude: locationMarker.latitude,
-            longitude: locationMarker.longitude,
+            latitude: location.latitude,
+            longitude: location.longitude,
             latitudeDelta: 0.09,
             longitudeDelta: 0.035
         });
@@ -125,51 +262,76 @@ export default class Home extends Component  {
         this.state.markers[index].showCallout()
     };
 
-    onMarkerPressed = (locationMarker, index) => {
+    onMarkerPressed = (location, index) => {
         this._map.animateToRegion({
-            latitude: locationMarker.latitude,
-            longitude: locationMarker.longitude,
+            latitude: location.latitude,
+            longitude: location.longitude,
             latitudeDelta: 0.09,
             longitudeDelta: 0.035
         });
 
         this._carousel.snapToItem(index);
     };
-    renderCarouselItem;
 
-    UpdateStart =(ee) => {
-        this.setState({ ee });
-        let AfterChanged = ee;
-        let CoordsValues ={
-            latitude: AfterChanged.latitude,
-            longitude: AfterChanged.longitude,
-        };
-        this.setState({ CoordsValues });
-    };
-
-    SetDestination =(ee) => {
-        this.setState({ ee });
-        let AfterChanged = ee;
-        let CoordsValues ={
-            latitude: AfterChanged.latitude,
-            longitude: AfterChanged.longitude,
-        };
-        this.setState({ CoordsValues });
-    };
-
+    taxichose(){
+        this.props.navigation.navigate('Choosetaxi', {
+            localisation:this.state.departinfo.lat+","+this.state.departinfo.lng,
+            departinfo:this.state.departinfo,
+            destinationinfo:this.state.destinationinfo
+          });
+    }
+    // 'charset' => 'utf8',
+    //         'collation' => 'utf8_unicode_ci',
+    confirmOrder=(Info)=>{
+        // this.props.navigation.navigate('Choosetaxi', {
+        //     localisation:this.state.departinfo.lat+","+this.state.departinfo.lng
+        //   });
+        console.log(Info);
+    }
+//    renderCarouselItem = ({ item }) =>
+//         <View style={styles.cardContainer}>
+//             <Text style={styles.cardTitle}>{item.name}</Text>
+//             <Image style={styles.cardImage} source={item.image} />
+//             <TouchableOpacity onPress={() =>  this.props.navigation.navigate('Start_Destination', item)}>
+//                 <Text>{item.name}</Text>
+//             </TouchableOpacity>
+//         </View>;
+    displaycarosery=()=>{  
+        if(Object.keys(this.state.departinfo).length  != 0 && Object.keys(this.state.destinationinfo).length   != 0){
+         return(
+             <>
+                <Carouseltaxis
+                        confirmOrder={this.confirmOrder} 
+                        containerCustomStyle={styles.carousel}
+                        departinfo={this.state.departinfo}
+                        destinationinfo={this.state.destinationinfo}>
+                </Carouseltaxis>
+                <View style={styles.choosetaxi}>
+                <Button onPress={()=>{this.taxichose()}} block  light>
+                   <Text >List Taxis</Text>
+                </Button>
+                </View>
+                </>
+            )   
+        }else{
+            return 
+        }
+    
+    }
     render() {
+
         let lat1 = JSON.stringify(this.state.initialPosition);
-         this.LatLng = {
+        let LatLng = {
             latitude: 1,
             longitude: 1,
         };
         if(lat1 !== undefined){
-            this.LatLng = {
+             LatLng = {
                 latitude: this.state.initialPosition.latitude,
                 longitude: this.state.initialPosition.longitude
             };
+            console.log(this.state.initialPosition.latitude)
         }
-
 
 
         let text = 'Waiting...';
@@ -179,70 +341,40 @@ export default class Home extends Component  {
             text = JSON.stringify(this.state.location);
         }
 
-        this.renderCarouselItem = ({item}) =>
-            <View style={styles.cardContainer}>
-                <Text style={styles.cardTitle}>{item.name}</Text>
-                <Image style={styles.cardImage} source={item.image} />
-                <Button title={'Go Order'} onPress={() =>
-                    this.props.navigation.navigate('Order_Summary')}>
-                </Button>
-            </View>;
-
         return (
-            <View style={styles.container}>
+            <View style={styles.container}> 
                 <MapView style={styles.map}
-                         ref={map => this._map = map}
                          provider={PROVIDER_GOOGLE}
+                         ref={map => this._map = map}
                          showsUserLocation={true}
                          initialRegion={this.state.initialPosition}
                 >
                     <MapView.Circle
-                        center={this.LatLng}
+                        center={LatLng}
                         radius={2000}
                         fillColor={'rgba(255,157,245,0.5)'}
                     />
 
-                    <Marker
-                        pinColor={'rgba(124,7,255,0.5)'}
-                        coordinate={this.LatLng}
-                        draggable
-                        onDragEnd={(e) => {this.UpdateStart( e.nativeEvent.coordinate)}}
-
-                    >
-                        <Callout>
-                            <Text>User</Text>
-                        </Callout>
-                    </Marker>
-                    <Marker
-                        pinColor={'rgba(255,10,16,0.5)'}
-                        coordinate={{latitude:34.052910, longitude:-6.781228}}
-                        draggable
-                        onDragEnd={(e) => {this.SetDestination( e.nativeEvent.coordinate)}}
-
-                    >
-                        <Callout>
-                            <Text>Destination</Text>
-                        </Callout>
-                    </Marker>
-
-                    {
+                    {/* {
                         this.state.coordinates.map((marker, index) => (
                             <Marker
                                 key={marker.name}
                                 ref={ref => this.state.markers[index] = ref}
                                 onPress={() => this.onMarkerPressed(marker, index)}
                                 coordinate={{ latitude: marker.latitude, longitude: marker.longitude }}
-                                pinColor={'rgba(223,255,22,0.6)'}
-                                // icon={require('../../assets/Images/taxi.png')}
+                               // icon={require('../../assets/Images/taxi.png')}
                             >
                                 <Callout>
                                     <Text>{marker.name}</Text>
                                 </Callout>
                             </Marker>
                         ))
-                    }
+                    } */}
+                    
+                    {this.departmarker()}
+                    {this.destinationmarker()}
                 </MapView>
-                <Carousel
+                {/* <Carousel
                     ref={(c) => { this._carousel = c; }}
                     data={this.state.coordinates}
                     containerCustomStyle={styles.carousel}
@@ -251,8 +383,14 @@ export default class Home extends Component  {
                     itemWidth={300}
                     removeClippedSubviews={false}
                     onSnapToItem={(index) => this.onCarouselItemChange(index)}
-                />
+                /> */}
+                {/* search     */}
+                {this.searchinterface()}
+                {/* search     */}
 
+                {/* liste des Taxi     */}
+                {this.displaycarosery()}
+                {/* liste des Taxi     */}
             </View>
         );
     }
@@ -263,10 +401,7 @@ const styles = StyleSheet.create({
         ...StyleSheet.absoluteFillObject
     },
     map: {
-        flex: 1,
-        width: '100%',
-        height: '100%',
-        position: 'absolute',
+        ...StyleSheet.absoluteFillObject
     },
     paragraph: {
         margin: 24,
@@ -302,9 +437,15 @@ const styles = StyleSheet.create({
         fontSize: 22,
         alignSelf: 'center'
     },
-    ConButton: {
-        marginTop: 650,
-        width: '100%',
-        fontSize: 30
+    choosetaxi:{ 
+        position: 'absolute',
+        bottom: 0, 
+        alignSelf: 'flex-end',
+        width:'100%'
+    },
+    search:{
+        position: 'absolute',
+        top: 0,
+        width:'100%'
     }
 });

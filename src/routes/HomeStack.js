@@ -5,6 +5,7 @@ import HeaderNone from "../shared/headerNone";
 import Order_Summary from '../screens/Order_Summary';
 import About from "../screens/About";
 import React from 'react';
+import ChooseTaxi from '../screens/ChooseTaxi';
 const screens = {
     Home:{
         screen: Home,
@@ -13,6 +14,9 @@ const screens = {
                 headerTitle: () => <Header navigation={navigation} title='Home'/>,
             }
         }
+    },
+    Choosetaxi:{
+        screen: ChooseTaxi,
     },
     Order_Summary:{
         screen: Order_Summary,
