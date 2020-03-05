@@ -1,8 +1,9 @@
 
 
 
-export const APIURL = "https://a5e94252.ngrok.io";
+// export const APIURL = "https://a5e94252.ngrok.io";
 
+import { APIURL } from "./fetchURL";
 export function geocode(){
     fetch('https://maps.googleapis.com/maps/api/geocode/json?latlng=34.066645,-6.762011&key=AIzaSyCoIzI4JvkT0MjvaBXH-OSt6d6pYuU1dMg'
            )
