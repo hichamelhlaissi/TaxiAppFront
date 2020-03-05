@@ -102,58 +102,11 @@ export default class ChooseTaxi extends Component  {
     Taxis = "";
     destinationinfo = {};
     departinfo = {};
-    
-    // getcord =()=>{
-    //    new Promise(function(res , rej) {
-    //     for (const cord of Taxi) {
-    //         cord.lat_long = cord.latitude+","+cord.longitude;
-    //     } 
-    //     res(Taxi);
-    //     })
-    //     .then(data =>{
-    //       for(let index = 0; index < Taxi.length; index++) {
-    //          this.Taxis += Taxi[index].lat_long;
-    //          if(index != Taxi.length-1){
-    //             this.Taxis +="|"   
-    //          }             
-    //        }  
-    //     }).finally(
-    //         data=>{
-    //             // console.log(this.Taxis)
-    //             this.getdistance()
-    //             // this.setState({Taxis:this.Taxis})
-    //         }
-    //     )        
-    // }
     componentDidUpdate(prevState){
         // if (this.state !== prevState) {
         //     console.log(this.Taxis)
         //   }
        
-    }
-    getdistance=()=>{
-        // console.log(this.Taxis)
-        // fetch('https://maps.googleapis.com/maps/api/distancematrix/json?origins='+this.clientP+'&destinations='+this.Taxis+'&key=AIzaSyCoIzI4JvkT0MjvaBXH-OSt6d6pYuU1dMg')
-        // .then((response) => response.json())
-        // .then((data)=>{
-        //       for (const dd of data.rows) {
-        //           let i =0;
-        //           for (const element of dd.elements) {
-        //             if(element.status == "OK"){
-        //                 Taxi[i].distance = element.distance.text;
-        //                 Taxi[i].distance = Taxi[i].distance.replace(/\s/g, '');
-        //             // console.log(Taxi[i].distance.replace(/\s/g, '')) 
-        //             } 
-        //             i++;
-        //           }
-        //       } 
-        //   }).catch(er=>{
-        //     // console.log(er)
-        //   })
-        //   .finally(data=>{
-        //     Taxi.sort((a, b) => (parseInt(a.distance) > parseInt(b.distance)) ? 1 : -1); 
-        //     this.setState({ listTaxi:Taxi}); 
-        //   })
     }
     renderRow=({item})=> {
 
@@ -189,8 +142,9 @@ export default class ChooseTaxi extends Component  {
         };
         res(infoOrder);
         }).then(data=>{
-        //   this.props.confirmOrder(data);
-        console.log(data)
+            this.props.navigation.navigate('Order_Summary', { 
+                info:data
+              });
         })
       }
     cancelselection=()=>{

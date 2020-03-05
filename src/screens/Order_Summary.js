@@ -6,9 +6,20 @@ import {APPROX_STATUSBAR_HEIGHT} from "react-native-paper/src/constants";
 
 export default class Order_Summary extends Component {
 
+    // state = {
+    //     From:{},
+    //     To:{},
+    //     Orderinfo:{}
+    // }
     constructor(props){
         super(props);
         const {state} = props.navigation;
+        this.state={
+             From:state.params.info.From,
+             To:state.params.info.To,
+             Taxiinfo:state.params.info.Taxiinfo
+        }
+        console.log(this.state.To)
     }
 
     render() {

@@ -26,8 +26,11 @@ export default class Home extends Component  {
     state = {
         locationpermission :false,
         departinfo:{},
-        destinationinfo:{},
-        location: null,
+        destinationinfo:{
+            "lat": 34.076353,
+            "lng": -6.754076
+        },
+        location: null, 
         errorMessage: null,
         markers: [],
         appState: AppState.currentState,
@@ -283,10 +286,9 @@ export default class Home extends Component  {
     // 'charset' => 'utf8',
     //         'collation' => 'utf8_unicode_ci',
     confirmOrder=(Info)=>{
-        // this.props.navigation.navigate('Choosetaxi', {
-        //     localisation:this.state.departinfo.lat+","+this.state.departinfo.lng
-        //   });
-        console.log(Info);
+        this.props.navigation.navigate('Order_Summary', { 
+            info:Info
+          });
     }
 //    renderCarouselItem = ({ item }) =>
 //         <View style={styles.cardContainer}>
