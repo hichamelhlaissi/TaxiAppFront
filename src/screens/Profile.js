@@ -1,11 +1,66 @@
 import React, { Component } from 'react';
-import {StyleSheet, Text, View, Image, TouchableOpacity, TextInput, Button, KeyboardAvoidingView, ScrollView} from 'react-native';
+import {StyleSheet, Text, View, Image, ActivityIndicator, TextInput, Button, KeyboardAvoidingView, ScrollView} from 'react-native';
 import { Icon } from 'react-native-elements'
 import { Formik } from 'formik';
+import RNRestart from 'react-native-restart';
+
 import * as yup from 'yup';
+import {APIURL} from '../fetchURL'
+
+
+
 
 export default class Profile extends Component{
+    constructor(props) {
+        super(props);
+        this.state = { isLoading: true };
+    };
+    componentDidMount() {
+        this.GetProfile()
+    }
+
+    GetProfile =()=>{
+        return fetch(APIURL+'/api/profile/2')
+            .then(response => response.json())
+            .then(responseJson => {
+                this.setState(
+                    {
+                        isLoading: false,
+                        dataSource: responseJson,
+                    },
+                    function() {}
+                );
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    };
+
+     UpdateProfile =(DataInput)=>{
+        this.setState({isLoading: true});
+        fetch(APIURL + '/api/profile/2', {
+            method: 'PUT',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+
+            body: JSON.stringify({
+                name: DataInput.Name,
+                email: DataInput.Email,
+                phone: DataInput.Phone_Number,
+                gender: DataInput.Gender,
+            }),
+
+
+        }).then(r  =>this.GetProfile());
+
+        return console.log(DataInput);
+
+    };
+
     render() {
+
 
         const CheckField = yup.object({
             Name: yup.string().required().max(40).min(5),
@@ -19,6 +74,16 @@ export default class Profile extends Component{
                 })
 
         });
+        if (this.state.isLoading) {
+            return (
+                <View style={{ flex: 1, padding: 20 }}>
+                    <ActivityIndicator />
+                </View>
+            );
+        }
+
+
+
         return (
             <View style={styles.container}>
                 <ScrollView>
@@ -27,26 +92,33 @@ export default class Profile extends Component{
                     <Image style={styles.avatar} source={{uri: 'https://bootdey.com/img/Content/avatar/avatar6.png'}}/>
 
                     <Formik
-                        initialValues={{Name : '', Phone_Number : '', Email : '', Password : '', Gender : '', Language : ''}}
+                        initialValues={{
+                            Name : this.state.dataSource.name,
+                            Phone_Number : this.state.dataSource.phone,
+                            Email : this.state.dataSource.email,
+                            Password : this.state.dataSource.Password,
+                            Gender : this.state.dataSource.gender,
+                            Language : this.state.dataSource.Language
+                        }}
                             onSubmit={(values) =>{
-                                console.log(values);
+                                this.UpdateProfile(values);
                             }}
                         validationSchema={CheckField}
                     >
                         {(props) =>(
                             <View style={styles.Form}>
-                                <Text>Name </Text>
+                                <Text> Name </Text>
                                 <TextInput style={styles.input}
-                                           placeholder='Hicham ELHLAISSI'
+
                                            onChangeText={props.handleChange('Name')}
                                            value={props.values.Name}
                                            onBlur={props.handleBlur('Name')}
                                 />
                                 <Text style={styles.errorText}>{props.touched.Name && props.errors.Name}</Text>
 
-                                <Text>Phone Number </Text>
+                                <Text> Phone Number </Text>
                                 <TextInput style={styles.input}
-                                           placeholder='0690870138'
+
                                            onChangeText={props.handleChange('Phone_Number')}
                                            value={props.values.Phone_Number}
                                            onBlur={props.handleBlur('Phone_Number')}
@@ -54,36 +126,36 @@ export default class Profile extends Component{
                                 />
                                 <Text style={styles.errorText}>{props.touched.Phone_Number && props.errors.Phone_Number}</Text>
 
-                                <Text>Email </Text>
-                                <TextInput style={styles.Email}
-                                           placeholder='elhlaissihicham@gmail.com'
+                                <Text> Email </Text>
+                                <TextInput style={styles.input}
+                                           placeholder={this.state.dataSource.email}
                                            onChangeText={props.handleChange('Email')}
                                            value={props.values.Email}
                                            onBlur={props.handleBlur('Email')}
                                 />
                                 <Text style={styles.errorText}>{props.touched.Email && props.errors.Email}</Text>
 
-                                <Text>Change Password </Text>
+                                <Text> Change Password </Text>
                                 <TextInput style={styles.input}
-                                           placeholder='**********'
+                                           placeholder='********'
                                            onChangeText={props.handleChange('Password')}
                                            value={props.values.Password}
                                            onBlur={props.handleBlur('Password')}
                                 />
                                 <Text style={styles.errorText}>{props.touched.Password && props.errors.Password}</Text>
 
-                                <Text>Gender </Text>
+                                <Text> Gender </Text>
                                 <TextInput style={styles.input}
-                                           placeholder='Male'
+                                           placeholder={this.state.dataSource.gender}
                                            onChangeText={props.handleChange('Gender')}
                                            value={props.values.Gender}
                                            onBlur={props.handleBlur('Gender')}
                                 />
                                 <Text style={styles.errorText}>{props.touched.Gender && props.errors.Gender}</Text>
 
-                                <Text>Language </Text>
+                                <Text> Language </Text>
                                 <TextInput style={styles.input}
-                                           placeholder='Language'
+                                           placeholder='Anglais'
                                            onChangeText={props.handleChange('Language')}
                                            value={props.values.Language}
                                            onBlur={props.handleBlur('Language')}

@@ -82,24 +82,35 @@ export default class Home extends Component  {
           ]);
 
     };
-    _getLocationAsync = async () => {
-        let { status } = await Permissions.askAsync(Permissions.LOCATION);
-        if (status !== 'granted') {
-            this.requestlocation();
-        }
+    _getLocationAsync =  () => {
+        // let { status } = await Permissions.askAsync(Permissions.LOCATION);
+        Location.getPermissionsAsync().then(data=>{
+            if(data.status == 'granted'){
+                Location.getCurrentPositionAsync({}).then(
+                    data=>{
+                        this.setState({location: data });
+                        let initialPosition = {
+                            latitude: data.coords.latitude,
+                            longitude: data.coords.longitude,
+                            latitudeDelta: 0.09,
+                            longitudeDelta: 0.035
+                        };
 
-        let location = await Location.getCurrentPositionAsync({});
-        this.setState({ location });
-
-        let initialPosition = {
-            latitude: location.coords.latitude,
-            longitude: location.coords.longitude,
-            latitudeDelta: 0.09,
-            longitudeDelta: 0.035
-        };
-        this.setState({ initialPosition });
-
-
+                        this.setState({ initialPosition,
+                            locationpermission:true,
+                            departinfo:{
+                                lat: data.coords.latitude,
+                                lng: data.coords.longitude,
+                            }});
+                    }
+                )
+            }else{
+                this.setState({
+                    errorMessage: 'Permission to access location was denied',
+                });
+                this.requestlocation();
+            }
+        })
     };
     onCarouselItemChange = (index) => {
         let locationMarker = this.state.coordinates[index];

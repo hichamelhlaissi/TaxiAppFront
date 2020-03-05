@@ -59,7 +59,6 @@ const styles = StyleSheet.create({
         height: 100,
     },
     tabBar: {
-        marginTop: APPROX_STATUSBAR_HEIGHT,
         backgroundColor: '#5780D9',
     },
     cardStyle: {
