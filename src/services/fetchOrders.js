@@ -17,14 +17,15 @@ export default {
         try {
             let response = await fetch(APIURL+'/api/order/orderscomfirmed');
             let responseJsonData = await response.json();
+            console.log(responseJsonData)
             return responseJsonData.data;
-        }
+        } 
         catch(e) {
             console.log(e)
         }
     },
-    async fetchOrdersRequest() {
-        try {
+    async fetchOrdersRequest() { 
+        try { 
             let response = await fetch(APIURL+'/api/order/orderspending');
             let responseJsonData = await response.json();
             return responseJsonData.data;

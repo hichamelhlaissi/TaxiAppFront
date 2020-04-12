@@ -10,7 +10,7 @@ import {APIURL} from '../fetchURL'
 
 
 
-export default class Profile extends Component{
+export default class Profile extends Component{ 
     constructor(props) {
         super(props);
         this.state = { isLoading: true };

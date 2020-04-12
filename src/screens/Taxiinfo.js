@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { View , Text} from 'native-base';
-import { StyleSheet , Alert } from 'react-native';
+import { View } from 'native-base';
+import { StyleSheet , Alert , Text } from 'react-native';
 import { Button , Spinner , Icon} from 'native-base';
 
 
@@ -11,19 +11,22 @@ export default class Taxiinfo extends Component{
     }
 
     Buttonselect =(item , av)=>{
-        if(this.props.idtaxiselected == 0){ 
+        
         if(av){
         return <Button bordered dark  rounded style={styles.select} onPress={()=>{this.props.selectedTaxi(item)}}><Text>Select</Text></Button> 
-        }else{
+        }
+        else{
         return <Button bordered dark  disabled rounded style={styles.select} onPress={()=>{console.log(item.id)}}><Text>Select</Text></Button>
         }   
-        }else{
-        if(item.id == this.props.idtaxiselected){
-        return <View style={styles.selected}><Text style={styles.statutP}>Statut :Pending</Text><Button icon bordered danger small  onPress={()=>{this.props.cancel()}}><Icon name='trash' /></Button></View>
-        }else{
-        return <Button bordered dark  disabled rounded style={styles.select} onPress={()=>{console.log(item.id)}}><Text>Select</Text></Button>
-        }   
-        }     
+        
+        
+        // else{
+        // if(item.id == this.props.idtaxiselected){
+        // return <View style={styles.selected}><Text style={styles.statutP}>Statut :Pending</Text><Button icon bordered danger small  onPress={()=>{this.props.cancel()}}><Icon name='trash' /></Button></View>
+        // }else{
+        // return <Button bordered dark  disabled rounded style={styles.select} onPress={()=>{console.log(item.id)}}><Text>Select</Text></Button>
+        // }   
+        // }     
     }
     available = (av)=>{
         if (av == 1) {
@@ -106,7 +109,8 @@ const styles = StyleSheet.create({
     },
     select:{
         width:80,
-        height:"65%"
+        height:"65%",
+        paddingLeft:15,
 
     },
     selected:{

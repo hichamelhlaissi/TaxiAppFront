@@ -15,7 +15,7 @@ import Carouseltaxis from './Carouseltaxis';
 
 import * as service from '../service';
 import * as Taxis from "./ChooseTaxi";
-// const AppNavigator = createStackNavigator(
+// const AppNavigator = createStackNavigator( 
 //     {
 
 //         Start_Destination: Start_Destination
@@ -27,8 +27,8 @@ export default class Home extends Component  {
         locationpermission :false,
         departinfo:{},
         destinationinfo:{
-            "lat": 34.076353,
-            "lng": -6.754076
+            // "lat": 34.076353,
+            // "lng": -6.754076
         },
         location: null, 
         errorMessage: null,
@@ -54,11 +54,11 @@ export default class Home extends Component  {
     //         this._getLocationAsync().then(r =>this._getLocationAsync() );
     //     }
     // }
-    constructor(props) {
-        super(props);
+    constructor(props) { 
+        super(props); 
         // N’appelez pas `this.setState()` ici !
         if (Platform.OS === 'android' && !Constants.isDevice || Platform.OS === 'ios' && !Constants.isDevice) {
-            this.setState({
+            this.setState({ 
                 errorMessage: 'Oops, this will not work on Sketch in an Android emulator. Try it on your device!',
             });
         } else {
@@ -88,13 +88,17 @@ export default class Home extends Component  {
             });
           }
           if( this.state.departinfo == this.state.destinationinfo){
-            this.problem();
-          }
-          if(Taxis.Taxi.length > 0 && this.state.coordinates.length == 0){ 
+            console.log('noooooo')
+          this.problem(); 
+        }if( this.state.destinationinfo){
+            if(this.state.coordinates.length != 0) this.setState({coordinates:Taxis.Taxi}) 
+        }
+
+        //   if(Taxis.Taxi.length > 0 && this.state.coordinates.length == 0){ 
               
-           this.setState({coordinates:Taxis.Taxi})
-        // console.log(Taxis.Taxi) 
-          }
+        //    this.setState({coordinates:Taxis.Taxi}) 
+        // // console.log(Taxis.Taxi) 
+        //   }
       }
       problem=()=>{
         Alert.alert("l'adresse de destination ne peut pas être la même que l'adresse de départ ", " tu dois la changer", [
@@ -258,27 +262,28 @@ export default class Home extends Component  {
      }
     }
     onCarouselItemChange = (index) => {
-        let location = this.state.coordinates[index];
+        // let location = this.state.coordinates[index];
+        // console.log(index);
+        // this._map.animateToRegion({
+        //     latitude: this.state.coordinates[index].latitude,
+        //     longitude: this.state.coordinates[index].longitude,
+        //     latitudeDelta: 0.0009,
+        //     longitudeDelta: 0.0035
+        // });
 
-        this._map.animateToRegion({
-            latitude: location.latitude,
-            longitude: location.longitude,
-            latitudeDelta: 0.09,
-            longitudeDelta: 0.035
-        });
-
-        this.state.markers[index].showCallout()
+        // this.state.markers[index].showCallout()
     };
 
     onMarkerPressed = (location, index) => {
+        console.log(location);
         this._map.animateToRegion({
-            latitude: location.latitude,
-            longitude: location.longitude,
-            latitudeDelta: 0.09,
+            latitude: 34.063351884153,
+            longitude: -6.7766090462461 , 
+            latitudeDelta: 0.09, 
             longitudeDelta: 0.035
         });
 
-        this._carousel.snapToItem(index);
+        // this._carousel.snapToItem(index);
     };
 
     taxichose(){
@@ -326,6 +331,32 @@ export default class Home extends Component  {
         }
     
     }
+    taxismarker(){
+        let taxis = [];
+        
+        if(this.state.coordinates.length > 0){
+            
+            return (
+               this.state.coordinates.map((marker, index) => (
+            <Marker
+                key={marker.id}
+                ref={ref => this.state.markers[index] = ref}
+                // onPress={() => this.onMarkerPressed(marker, index)}
+                coordinate={{ latitude: marker.latitude, longitude: marker.longitude }}
+               // icon={require('../../assets/Images/taxi.png')}
+            >
+                <Callout>
+                    <Text>{marker.ownername}</Text>
+                </Callout> 
+            </Marker>
+           ))  
+            )
+        }else{
+            // this.setState({coordinates:Taxis.Taxi})
+        }
+        return <></>
+        
+    }
     render() {
 
         let lat1 = JSON.stringify(this.state.initialPosition);
@@ -362,21 +393,9 @@ export default class Home extends Component  {
                         radius={2000}
                         fillColor={'rgba(255,157,245,0.5)'}
                     />
-
+                    
                     {
-                        this.state.coordinates.map((marker, index) => (
-                            <Marker
-                                key={marker.id}
-                                ref={ref => this.state.markers[index] = ref}
-                                onPress={() => this.onMarkerPressed(marker, index)}
-                                coordinate={{ latitude: marker.latitude, longitude: marker.longitude }}
-                               // icon={require('../../assets/Images/taxi.png')}
-                            >
-                                <Callout>
-                                    <Text>{marker.ownername}</Text>
-                                </Callout>
-                            </Marker>
-                        )) 
+                        this.taxismarker()
                     }
                     
                     {this.departmarker()}

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { View , Text} from 'native-base';
-import { StyleSheet , FlatList , Alert} from 'react-native';
+import { View } from 'native-base';
+import { StyleSheet , FlatList , Alert , Text} from 'react-native';
 import { Button , Spinner , Icon} from 'native-base';
 import Taxiinfo from './Taxiinfo';
 import * as service from '../service';
@@ -9,7 +9,7 @@ export const Taxi=[]
 
 export function getTaxis(){
     new Promise(function(res , rej) {
-        if(Taxi.length == 0){
+        if(Taxi){
             service.alltaxis()
             .then((response) => response.json())
             .then(
@@ -61,12 +61,14 @@ export function getTaxis(){
                         // Taxi[i].distance = element.distance.text;
                         Taxi[i].distance = Taxi[i].distance.replace(/\s/g, '');
                     // console.log(Taxi[i].distance.replace(/\s/g, '')) 
-                    } 
+                    }else{
+                        
+                    }
                     i++;
                   }
               } 
           }).catch(er=>{
-            // console.log(er)
+            console.log(er)
           })
           .finally(data=>{
             Taxi.sort((a, b) => (parseInt(a.distance) > parseInt(b.distance)) ? 1 : -1); 

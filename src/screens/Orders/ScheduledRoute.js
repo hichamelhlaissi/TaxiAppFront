@@ -25,7 +25,8 @@ export default class HistoryRoute extends Component {
 
     async componentDidMount() {
         const orders = await ajax.fetchOrdersScheduled();
-        this.setState({
+        console.log(orders);
+        this.setState({ 
             orders: orders,
             isLoading: false,
         });

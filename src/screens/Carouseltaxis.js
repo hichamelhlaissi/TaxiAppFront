@@ -18,7 +18,7 @@ export default class Carouseltaxis extends Component{
     constructor(props){
         super(props); 
         if(this.props.departinfo){
-        this.clientP = this.props.departinfo.lat+","+this.props.departinfo.lng;
+         this.clientP = this.props.departinfo.lat+","+this.props.departinfo.lng;
          this.getallTaxi = Taxi.getTaxis.bind(this);
          this.getallTaxi();
         }
